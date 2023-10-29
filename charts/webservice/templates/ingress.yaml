@@ -8,7 +8,7 @@ metadata:
   name: {{ include "helm-chart.name" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    {{- include "helm-chart.labels" | nindent 4 }}
+    {{- include "helm-chart.labels" . | nindent 4 }}
     {{- with .Values.ingress.labels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -38,11 +38,7 @@ spec:
               service:
                 name: {{ include "helm-chart.name" $ }}
                 port:
-                  {{- if kindIs "float64" .Values.service.port }}
-                  number: {{ .Values.service.port }}
-                  {{- else }}
-                  name: {{ .Values.service.port }}
-                  {{- end }}
+                  number: {{ $.Values.service.port }}
           {{- end -}}
     {{- end -}}
   {{- else }}
