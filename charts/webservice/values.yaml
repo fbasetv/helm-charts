@@ -89,7 +89,7 @@ autoscaling:
   # -- Average CPU utilization percentage
   targetCPUUtilizationPercentage: 60
   # -- Average memory utilization percentage
-  targetMemoryUtilizationPercentage: 60
+  targetMemoryUtilizationPercentage: 80
   # -- Configures the scaling behavior of the target in both Up and Down directions.
   behavior:
     {}
