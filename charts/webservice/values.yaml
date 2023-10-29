@@ -1,0 +1,387 @@
+nameOverride: ""
+fullnameOverride: ""
+
+# -- Image
+image:
+  repository: "nginx"
+  tag: ""
+  imagePullPolicy: "IfNotPresent"
+
+## Service configuration
+service:
+  # -- Service annotations
+  annotations: {}
+  # -- Service labels
+  labels: {}
+  # -- Service type
+  type: ClusterIP
+  # -- Service port
+  port: 80
+  # -- Service target port
+  targetPort:
+    80
+    # -- Used to maintain session affinity. Supports `ClientIP` and `None`
+  sessionAffinity: ""
+
+ingress:
+  # -- Enable an ingress resource for the
+  enabled: false
+  # -- Additional ingress annotations
+  annotations: {}
+  # -- Additional ingress labels
+  labels: {}
+  # -- Defines which ingress controller will implement the resource
+  ingressClassName: ""
+
+  # -- List of ingress hosts
+  ## Argo Ingress.
+  ## Hostnames must be provided if Ingress is enabled.
+  ## Secrets must be manually created in the namespace
+  hosts:
+    []
+    # - argocd.example.com
+
+  # -- List of ingress paths
+  paths:
+    - /
+  # -- Ingress path type. One of `Exact`, `Prefix` or `ImplementationSpecific`
+  pathType: Prefix
+  # -- Additional ingress paths
+  extraPaths:
+    []
+    # - path: /*
+    #   pathType: Prefix
+    #   backend:
+    #     service:
+    #       name: ssl-redirect
+    #       port:
+    #         name: use-annotation
+
+  # -- Ingress TLS configuration
+  tls:
+    []
+    # - secretName: your-certificate-name
+    #   hosts:
+    #     - argocd.example.com
+
+  # -- Uses `server.service.servicePortHttps` instead `server.service.servicePortHttp`
+  https: false
+
+# -- The number of pods to run
+replicas: 1
+
+# -- Resource limits and requests
+resources:
+  limits:
+    cpu: 300m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+## Horizontal Pod Autoscaler
+autoscaling:
+  enabled: false
+  # -- Minimum number of replicas
+  minReplicas: 1
+  # -- Maximum number of replicas
+  maxReplicas: 5
+  # -- Average CPU utilization percentage
+  targetCPUUtilizationPercentage: 60
+  # -- Average memory utilization percentage
+  targetMemoryUtilizationPercentage: 60
+  # -- Configures the scaling behavior of the target in both Up and Down directions.
+  behavior:
+    {}
+    # scaleDown:
+    #  stabilizationWindowSeconds: 300
+    #  policies:
+    #   - type: Pods
+    #     value: 1
+    #     periodSeconds: 180
+    # scaleUp:
+    #   stabilizationWindowSeconds: 300
+    #   policies:
+    #   - type: Pods
+    #     value: 2
+    #     periodSeconds: 60
+  # -- Configures custom HPA metrics for the web service
+  # Ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+  metrics: []
+
+# -- Secrets with credentials to pull images from a private registry
+# @default -- `[]` (defaults to global.imagePullSecrets)
+imagePullSecrets: []
+
+# -- Additional command line arguments to pass
+extraArgs: []
+# -- Environment variables to pass
+env: []
+
+# -- envFrom to pass
+# @default -- `[]` (See [values.yaml])
+envFrom: []
+# - configMapRef:
+#     name: config-map-name
+# - secretRef:
+#     name: secret-name
+
+# -- Specify postStart and preStop lifecycle hooks for your argo-cd-server container
+lifecycle: {}
+
+# -- Additional containers to be added to the pod
+## Note: Supports use of custom Helm templates
+extraContainers: []
+# - name: my-sidecar
+#   image: nginx:latest
+# - name: lemonldap-ng-controller
+#   image: lemonldapng/lemonldap-ng-controller:0.2.0
+#   args:
+#     - /lemonldap-ng-controller
+#     - --alsologtostderr
+#     - --configmap=$(POD_NAMESPACE)/lemonldap-ng-configuration
+#   env:
+#     - name: POD_NAME
+#       valueFrom:
+#         fieldRef:
+#           fieldPath: metadata.name
+#     - name: POD_NAMESPACE
+#       valueFrom:
+#         fieldRef:
+#           fieldPath: metadata.namespace
+#   volumeMounts:
+#   - name: copy-portal-skins
+#     mountPath: /srv/var/lib/lemonldap-ng/portal/skins
+
+# -- Init containers to add to the pod
+## If your target Kubernetes cluster(s) require a custom credential (exec) plugin
+## you could use this (and the same in the application controller pod) to provide such executable
+## Ref: https://kubernetes.io/docs/reference/access-authn-authz/authentication/#client-go-credential-plugins
+initContainers: []
+#  - name: download-tools
+#    image: alpine:3
+#    command: [sh, -c]
+#    args:
+#      - wget -qO kubelogin.zip https://github.com/Azure/kubelogin/releases/download/v0.0.25/kubelogin-linux-amd64.zip &&
+#        unzip kubelogin.zip && mv bin/linux_amd64/kubelogin /custom-tools/
+#    volumeMounts:
+#      - mountPath: /custom-tools
+#        name: custom-tools
+
+# -- Additional volumeMounts to the main container
+volumeMounts: []
+#  - mountPath: /usr/local/bin/kubelogin
+#    name: custom-tools
+#    subPath: kubelogin
+
+# -- Additional volumes to the pod
+volumes: []
+#  - name: custom-tools
+#    emptyDir: {}
+
+# -- Annotations to be added to Deployment
+deploymentAnnotations: {}
+
+# -- Annotations to be added to pods
+podAnnotations: {}
+
+# -- Labels to be added to pods
+podLabels: {}
+
+# -- Host Network for application controller pods
+hostNetwork: false
+
+# -- [DNS configuration]
+dnsConfig: {}
+# -- Alternative DNS policy for application controller pods
+dnsPolicy: "ClusterFirst"
+
+## Readiness and liveness probes for default backend
+## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
+readinessProbe:
+  enabled: false
+  path: /health
+  # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
+  failureThreshold: 3
+  # -- Number of seconds after the container has started before [probe] is initiated
+  initialDelaySeconds: 10
+  # -- How often (in seconds) to perform the [probe]
+  periodSeconds: 10
+  # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
+  successThreshold: 1
+  # -- Number of seconds after which the [probe] times out
+  timeoutSeconds: 1
+
+livenessProbe:
+  enabled: false
+  path: /health
+  # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
+  failureThreshold: 3
+  # -- Number of seconds after the container has started before [probe] is initiated
+  initialDelaySeconds: 10
+  # -- How often (in seconds) to perform the [probe]
+  periodSeconds: 10
+  # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
+  successThreshold: 1
+  # -- Number of seconds after which the [probe] times out
+  timeoutSeconds: 1
+
+# -- terminationGracePeriodSeconds for container lifecycle hook
+terminationGracePeriodSeconds: 30
+
+# -- Priority class for the pods
+# @default -- `""` (defaults to global.priorityClassName)
+priorityClassName: ""
+
+# -- [Node selector]
+# @default -- `{}` (defaults to global.nodeSelector)
+nodeSelector: {}
+
+# -- [Tolerations] for use with node taints
+# @default -- `[]` (defaults to global.tolerations)
+tolerations: []
+
+# -- Assign custom [affinity] rules to the deployment
+# @default -- `{}` (defaults to global.affinity preset)
+affinity: {}
+
+# -- Assign custom [TopologySpreadConstraints] rules to the Argo CD
+## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+## If labelSelector is left out, it will default to the labelSelector configuration of the deployment
+topologySpreadConstraints:
+  []
+  # - maxSkew: 1
+  #   topologyKey: topology.kubernetes.io/zone
+  #   whenUnsatisfiable: DoNotSchedule
+
+# -- Deployment strategy to be added to the Deployment
+deploymentStrategy:
+  {}
+  # type: RollingUpdate
+  # rollingUpdate:
+  #   maxSurge: 25%
+  #   maxUnavailable: 25%
+
+## Argo CD Pod Disruption Budget
+## Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+pdb:
+  # -- Deploy a [PodDisruptionBudget] for the
+  enabled: false
+  # -- Labels to be added pdb
+  labels: {}
+  # -- Annotations to be added pdb
+  annotations: {}
+  # -- Number of pods that are available after eviction as number or percentage (eg.: 50%)
+  # @default -- `""` (defaults to 0 if not specified)
+  minAvailable: ""
+  # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%).
+  ## Has higher precedence over `server.pdb.minAvailable`
+  maxUnavailable: ""
+
+## Globally shared configuration
+global:
+  # -- Common labels for the all resources
+  additionalLabels: {}
+
+  # -- Number of old deployment ReplicaSets to retain. The rest will be garbage collected.
+  revisionHistoryLimit: 3
+
+  # Default image used by all components
+  image:
+    # -- If defined, a repository applied to all Argo CD deployments
+    repository: ""
+    # -- Overrides the global Argo CD image tag whose default is the chart appVersion
+    tag: ""
+    # -- If defined, a imagePullPolicy applied to all Argo CD deployments
+    imagePullPolicy: IfNotPresent
+
+  # -- Secrets with credentials to pull images from a private registry
+  imagePullSecrets: []
+
+  # Default logging options used by all components
+  logging:
+    # -- Set the global logging format. Either: `text` or `json`
+    format: text
+    # -- Set the global logging level. One of: `debug`, `info`, `warn` or `error`
+    level: info
+
+  # -- Annotations for the all deployed Statefulsets
+  statefulsetAnnotations: {}
+
+  # -- Annotations for the all deployed Deployments
+  deploymentAnnotations: {}
+
+  # -- Annotations for the all deployed pods
+  podAnnotations: {}
+
+  # -- Labels for the all deployed pods
+  podLabels: {}
+
+  # -- Add Prometheus scrape annotations to all metrics services. This can be used as an alternative to the ServiceMonitors.
+  addPrometheusAnnotations: false
+
+  # -- Toggle and define pod-level security context.
+  # @default -- `{}` (See [values.yaml])
+  securityContext: {}
+  #  runAsUser: 999
+  #  runAsGroup: 999
+  #  fsGroup: 999
+
+  # -- Mapping between IP and hostnames that will be injected as entries in the pod's hosts files
+  hostAliases: []
+  # - ip: 10.20.30.40
+  #   hostnames:
+  #   - git.myhostname
+
+  # Default network policy rules used by all components
+  networkPolicy:
+    # -- Create NetworkPolicy objects for all components
+    create: false
+    # -- Default deny all ingress traffic
+    defaultDenyIngress: false
+
+  # -- Default priority class for all components
+  priorityClassName: ""
+
+  # -- Default node selector for all components
+  nodeSelector: {}
+
+  # -- Default tolerations for all components
+  tolerations: []
+
+  # Default affinity preset for all components
+  affinity:
+    # -- Default pod anti-affinity rules. Either: `none`, `soft` or `hard`
+    podAntiAffinity: soft
+    # Node affinity rules
+    nodeAffinity:
+      # -- Default node affinity rules. Either: `none`, `soft` or `hard`
+      type: hard
+      # -- Default match expressions for node affinity
+      matchExpressions:
+        []
+        # - key: topology.kubernetes.io/zone
+        #   operator: In
+        #   values:
+        #    - antarctica-east1
+        #    - antarctica-west1
+
+  # -- Default [TopologySpreadConstraints] rules for all components
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+  ## If labelSelector is left out, it will default to the labelSelector of the component
+  topologySpreadConstraints:
+    []
+    # - maxSkew: 1
+    #   topologyKey: topology.kubernetes.io/zone
+    #   whenUnsatisfiable: DoNotSchedule
+
+  # -- Deployment strategy for the all deployed Deployments
+  deploymentStrategy:
+    {}
+    # type: RollingUpdate
+    # rollingUpdate:
+    #   maxSurge: 25%
+    #   maxUnavailable: 25%
+
+  # -- Environment variables to pass to all deployed Deployments
+  env: []
