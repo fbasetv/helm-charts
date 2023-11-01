@@ -3,7 +3,17 @@ entries:
   webservice:
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2023-10-31T20:41:23.115818834-06:00"
+    created: "2023-10-31T21:01:12.72803623-06:00"
+    description: A Helm chart for web services
+    digest: 2926611bfef9ccbd56781c627f0bcfbf4ee47a42927b1a8da936d5f861e3c751
+    icon: https://avatars.githubusercontent.com/u/123843328?s=200&v=4
+    name: webservice
+    urls:
+    - https://fbasetv.github.io/helm-charts/webservice-0.1.3.tgz
+    version: 0.1.3
+  - apiVersion: v1
+    appVersion: "1.0"
+    created: "2023-10-31T21:01:12.727411292-06:00"
     description: A Helm chart for web services
     digest: c393e2559589a6522714638e00d5aa9c683b52be1fcd98d1681b0d9ef757c70b
     icon: https://avatars.githubusercontent.com/u/123843328?s=200&v=4
@@ -13,7 +23,7 @@ entries:
     version: 0.1.2
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2023-10-31T20:41:23.114207642-06:00"
+    created: "2023-10-31T21:01:12.726690396-06:00"
     description: A Helm chart for web services
     digest: ebf0cca544635dd5f37f74b799e46b6e5bbf5770e9c302fbca99cff686a0a4fd
     icon: https://avatars.githubusercontent.com/u/123843328?s=200&v=4
@@ -31,4 +41,4 @@ entries:
     urls:
     - https://fbasetv.github.io/helm-charts/webservice-0.1.0.tgz
     version: 0.1.0
-generated: "2023-10-31T20:41:23.112480541-06:00"
+generated: "2023-10-31T21:01:12.725787935-06:00"
