@@ -25,9 +25,8 @@ service:
 
 ingress:
   # -- Enable an ingress resource for the
-  enabled: true
+  enabled: false
   annotations:
-    kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-production
   ingressClassName: nginx
   hosts:
@@ -86,7 +85,7 @@ resources:
 
 ## Horizontal Pod Autoscaler
 autoscaling:
-  enabled: true
+  enabled: false
   # -- Minimum number of replicas
   minReplicas: 1
   # -- Maximum number of replicas
